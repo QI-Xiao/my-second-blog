@@ -25,7 +25,11 @@ SECRET_KEY = 'l4uk$moib1)d&l&+@d0a9z$a*0oy_b%(43q!1fzli%hhwd%lwy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+AllOWED_HOSTS = [
+    'qixiao.pythonanywhere.com',
+    '',
+]
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -41,6 +45,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # 'django.middleware.security.SecurityMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
