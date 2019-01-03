@@ -8,6 +8,8 @@ class Post(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
+    # null    如果值为True, 在数据库中Django将把空值储存为Null。默认值为False。
+    # blank   如果值为True, 字段允许为空。默认值为False
 
     def publish(self):
         self.published_date = timezone.now()
