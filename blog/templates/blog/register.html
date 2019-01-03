@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+    {% load staticfiles %}
+    <html>
+        <head>
+            <title>Django Girls blog</title>
+            <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+            <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+            <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+            <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+            <style>
+            #div{
+                width: 400px;
+                height: 100px;
+                /*background: red;*/
+                position: absolute;
+                left: -webkit-calc(50% - 200px);
+                top: -webkit-calc(50% - 50px);
+            }
+            </style>
+        </head>
+        <body>
+            <div class="page-header">
+                <h1><a href="/">Django Girls Blog</a></h1>
+            </div>
+            <div id="div">
+                <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                    <label for="{{uf.username.id_for_label}}" class="col-xs-4 col-sm-4 col-md-4  control-label">用户名</label>
+                    <div class="col-sm-3">
+                        {{uf.username}}
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="{{uf.password.id_for_label }}" class="col-xs-4 col-sm-4 col-md-4 control-label">密码</label>
+                    <div class="col-sm-3">
+                        {{uf.password}}
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="{{uf.passwordagain.id_for_label }}" class="col-xs-4 col-sm-4 col-md-4 control-label">再次输入密码</label>
+                    <div class="col-sm-3">
+                        {{uf.passwordagain}}
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="col-xs-offset-4 col-xs-4 col-sm-offset-4 col-sm-4">
+                        {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <button type="submit" class="btn btn-default">注册</button>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </body>
+    </html>
+
+
