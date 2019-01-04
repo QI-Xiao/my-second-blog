@@ -22,36 +22,38 @@
             <div class="page-header">
                 <h1><a href="/">Django Girls Blog</a></h1>
             </div>
-            <div id="div">
-                <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                    <label for="{{uf.username.id_for_label}}" class="col-xs-4 col-sm-4 col-md-4  control-label">用户名</label>
-                    <div class="col-sm-3">
-                        {{uf.username}}
+            <div class="col-xs-offset-2 col-sm-offset-4 col-md-offset-4 col-xs-8 col-sm-4 col-md-4">
+            <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group input-group">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     </div>
+                    {{uf.username}}
+                </div>
+                <div class="form-group input-group">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
                     </div>
-                    <div class="form-group">
-                    <label for="{{uf.password.id_for_label }}" class="col-xs-4 col-sm-4 col-md-4 control-label">密码</label>
-                    <div class="col-sm-3">
-                        {{uf.password}}
+                    {{uf.password}}
+                </div>
+                <div class="form-group input-group">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
                     </div>
+                    {{uf.passwordagain}}
+                </div>
+                <div class="form-group">
+                    {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span>
+                        {{ error_message }}
                     </div>
-                    <div class="form-group">
-                    <label for="{{uf.passwordagain.id_for_label }}" class="col-xs-4 col-sm-4 col-md-4 control-label">再次输入密码</label>
-                    <div class="col-sm-3">
-                        {{uf.passwordagain}}
-                    </div>
-                    </div>
-                    <div class="form-group">
-                    <div class="col-xs-offset-4 col-xs-4 col-sm-offset-4 col-sm-4">
-                        {% if error_message %}
-                        <p><strong>{{ error_message }}</strong></p>
-                        {% endif %}
-                        <button type="submit" class="btn btn-default">注册</button>
-                    </div>
-                    </div>
-                </form>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary btn-block">注册</button>
+                </div>
+            </form>
             </div>
         </body>
     </html>

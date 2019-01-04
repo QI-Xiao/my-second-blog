@@ -11,6 +11,6 @@ class PostForm(forms.ModelForm):
 
 
 class UserForm(forms.Form):
-    username = forms.CharField(label='用户名', max_length=100, widget=forms.TextInput(attrs={'placeholder':'请输入用户名'}))
-    password = forms.CharField(label='密码', widget=forms.PasswordInput(attrs={'placeholder':'请输入密码'}))
-    passwordagain = forms.CharField(label='再次输入密码', widget=forms.PasswordInput(attrs={'placeholder':'请重复密码'}))
+    username = forms.CharField(label='用户名', max_length=100, widget=forms.TextInput(attrs={'placeholder':'用户名', 'class':'form-control'}))
+    password = forms.CharField(label='密码', widget=forms.PasswordInput(attrs={'placeholder':'密码', 'class':'form-control'}))
+    passwordagain = forms.CharField(label='再次输入密码', widget=forms.PasswordInput(attrs={'placeholder':'确认密码', 'class':'form-control'}))
