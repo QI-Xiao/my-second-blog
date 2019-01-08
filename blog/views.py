@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
-from .models import Post
+from .models import Post, Comments, Likeit
 from .forms import PostForm, UserForm
 from django.contrib.auth.models import User
 from django.contrib import auth
@@ -88,8 +88,21 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
+    commentsthisarticle = post.comments_set.filter(commentexist=1)
+    likethisarticle = post.likeit_set.filter(likeitexist=1)
+    if request.user.is_authenticated:
+        likeituser = post.likeit_set.filter(likeituser=request.user)
+        if likeituser:
+            likeituserstate = likeituser.get().likeitexist
+        else:
+            likeituserstate = 0
+    else:
+        likeituserstate = -1
     return render(request, 'blog/post_detail.html', {
         'post': post,
+        'comments': commentsthisarticle,
+        'likeit': likethisarticle,
+        'likeituserstate': likeituserstate,
     })
 
 
@@ -131,3 +144,64 @@ def post_edit(request, pk):
             print('ffffffffffffffffffffff')
         return render(request, 'blog/post_edit.html', {'form': form})
     return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+
+
+def comment_on(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    print('post:', post)
+    if request.user.is_authenticated: # is_authenticated是一个属性而不是一个方法，后面不加括号
+        print('用户已登录')
+        getonecomment = request.POST.get('onecomment')
+        print('获取评论内容为：', getonecomment)
+        if getonecomment:
+            Comments.objects.create(
+                commentuser = request.user,
+                commentarticle = post,
+                commentcontent = getonecomment,
+            )
+            return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+        return HttpResponse('还没有评论')
+    return HttpResponse('请先登录')
+
+
+def click_like(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.user.is_authenticated:
+        print('用户已登录')
+        if request.POST.get('clicklikeit') == 'clicklikeit':
+            print('用户点击点赞按钮')
+            whoclick = post.likeit_set.filter(likeituser=request.user)
+            if whoclick:
+                print('数据点击前状态：', whoclick.get())
+                whoclick = whoclick.get()
+                if whoclick.likeitexist == 0:
+                    whoclick.likeitexist = 1
+                elif whoclick.likeitexist == 1:
+                    whoclick.likeitexist = 0
+                whoclick.save()
+            else:
+                print('数据点击前状态：', whoclick)
+                whoclick = Likeit.objects.create(
+                    likeituser=request.user,
+                    likeitarticle=post,
+                    likeitexist=1,
+                )
+            print('数据点击后状态：', whoclick)
+            return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+        print('未获得点击直接跳转')
+        return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+    return HttpResponse('请先登录')
+
+def del_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    try:
+        delthis = post.comments_set.filter(commentuser=request.user).get(pk=request.POST['delthiscomment'])
+        print('获得删除评论对象：', delthis)
+
+    except:
+        return HttpResponse('你没有此权限')
+    else:
+        delthis.commentexist = 0
+        delthis.save()
+        print('删除后评论对象为：', delthis)
+        return HttpResponseRedirect(reverse('post_detail', args=(pk,)))

@@ -13,12 +13,53 @@
             <h1>{{ post.title }}</h1>
             <p>{{ post.text|linebreaksbr }}</p>
         </div>
-    <div>
 
-    </div>
+        <br />
 
-    <div>
+    <form action="{% url 'click_like' pk=post.pk %}" method="post">
+    {% csrf_token %}
+        {% if likeituserstate == 1 %}
+        <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-default">取消点赞</button>
+        {% else %}
+        <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-primary">点赞</button>
+        {% endif %}
+    </form>
 
-    </div>
+    <br />
+    点赞数：{{likeit.count}}<br />
+    {% for onelike in likeit %}
+    {{onelike}}
+    {% endfor %}
+
+    <br />
+
+    <form action="{% url 'comment_on' pk=post.pk %}" method="post">
+    {% csrf_token %}
+        <input class="form-control" type="text" name="onecomment" placeholder="输入评论">
+        <button type="submit" class="btn btn-primary">评论</button>
+    </form>
+
+    <!--{% for comment in comments %}
+    {{ comment.commentarticle }}
+    {{ comment.commentuser }}
+    {{ comment.commenttime }}
+    {{ comment.commentcontent }}
+    {{ comment.commentexist }}
+    <br />
+    {% endfor %}-->
+
+    <form action="{% url 'del_comment' pk=post.pk %}" method="post">
+        {% csrf_token %}
+        {% for comment in comments %}
+        {{ comment.commentarticle }}
+        {{ comment.commentuser }}
+        {{ comment.commenttime }}
+        {{ comment.commentcontent }}
+        {{ comment.commentexist }}
+        <input type="radio" name="delthiscomment" id="comment{{ forloop.counter }}" value="{{ comment.id }}">
+        <label for="comment{{ forloop.counter }}">删除评论</label><br>
+        {% endfor %}
+        <input type="submit" value="删除">
+    </form>
 
     {% endblock %}
