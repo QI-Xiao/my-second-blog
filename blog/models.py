@@ -20,27 +20,27 @@ class Post(models.Model):
 
 
 class Comments(models.Model):
-    commentuser = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    commentarticle = models.ForeignKey('Post', on_delete=models.CASCADE)
-    commentcontent = models.TextField()
-    commenttime = models.DateTimeField(default=timezone.now)
-    commentexist = models.IntegerField(default=1)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    article = models.ForeignKey('Post', on_delete=models.CASCADE)
+    content = models.TextField()
+    time = models.DateTimeField(default=timezone.now)
+    isdelete = models.BooleanField(default=False)
 
     def __str__(self):
         return (
-                '评论人：%s，评论文章：%s，评论内容：%s，评论是否存在：%d'
-                % (self.commentuser, self.commentarticle, self.commentcontent, self.commentexist)
+                '评论人：%s，评论文章：%s，评论内容：%s，评论是否删除：%s'
+                % (self.user, self.article, self.content, self.isdelete)
         )
 
 
 class Likeit(models.Model):
-    likeituser = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    likeitarticle = models.ForeignKey('Post', on_delete=models.CASCADE)
-    likeittime = models.DateTimeField(default=timezone.now)
-    likeitexist = models.IntegerField(default=0)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    article = models.ForeignKey('Post', on_delete=models.CASCADE)
+    time = models.DateTimeField(default=timezone.now)
+    isdelete = models.BooleanField(default=False)
 
     def __str__(self):
         return (
-                '点赞人：%s，点赞文章：%s，点赞时间：%s，点赞是否存在：%d'
-                % (self.likeituser, self.likeitarticle, str(self.likeittime), self.likeitexist)
+                '点赞人：%s，点赞文章：%s，点赞时间：%s，点赞是否取消：%s'
+                % (self.user, self.article, str(self.time), self.isdelete)
         )

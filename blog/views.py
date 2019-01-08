@@ -88,16 +88,16 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    commentsthisarticle = post.comments_set.filter(commentexist=1)
-    likethisarticle = post.likeit_set.filter(likeitexist=1)
+    commentsthisarticle = post.comments_set.filter(isdelete=False)
+    likethisarticle = post.likeit_set.filter(isdelete=False)
     if request.user.is_authenticated:
-        likeituser = post.likeit_set.filter(likeituser=request.user)
+        likeituser = post.likeit_set.filter(user=request.user)
         if likeituser:
-            likeituserstate = likeituser.get().likeitexist
+            likeituserstate = likeituser.get().isdelete
         else:
-            likeituserstate = 0
+            likeituserstate = True
     else:
-        likeituserstate = -1
+        likeituserstate = True
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': commentsthisarticle,
@@ -155,9 +155,9 @@ def comment_on(request, pk):
         print('获取评论内容为：', getonecomment)
         if getonecomment:
             Comments.objects.create(
-                commentuser = request.user,
-                commentarticle = post,
-                commentcontent = getonecomment,
+                user = request.user,
+                article = post,
+                content = getonecomment,
             )
             return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
         return HttpResponse('还没有评论')
@@ -170,21 +170,20 @@ def click_like(request, pk):
         print('用户已登录')
         if request.POST.get('clicklikeit') == 'clicklikeit':
             print('用户点击点赞按钮')
-            whoclick = post.likeit_set.filter(likeituser=request.user)
+            whoclick = post.likeit_set.filter(user=request.user)
             if whoclick:
                 print('数据点击前状态：', whoclick.get())
                 whoclick = whoclick.get()
-                if whoclick.likeitexist == 0:
-                    whoclick.likeitexist = 1
-                elif whoclick.likeitexist == 1:
-                    whoclick.likeitexist = 0
+                if whoclick.isdelete is False:
+                    whoclick.isdelete = True
+                elif whoclick.isdelete is True:
+                    whoclick.isdelete = False
                 whoclick.save()
             else:
                 print('数据点击前状态：', whoclick)
                 whoclick = Likeit.objects.create(
-                    likeituser=request.user,
-                    likeitarticle=post,
-                    likeitexist=1,
+                    user=request.user,
+                    article=post,
                 )
             print('数据点击后状态：', whoclick)
             return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
@@ -192,16 +191,20 @@ def click_like(request, pk):
         return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
     return HttpResponse('请先登录')
 
+
 def del_comment(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    try:
-        delthis = post.comments_set.filter(commentuser=request.user).get(pk=request.POST['delthiscomment'])
+    if post.author == request.user:
+        delthis = post.comments_set.get(pk=request.POST['delthiscomment'])
+        print('文章作者进行的操作')
         print('获得删除评论对象：', delthis)
-
-    except:
-        return HttpResponse('你没有此权限')
     else:
-        delthis.commentexist = 0
-        delthis.save()
-        print('删除后评论对象为：', delthis)
-        return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+        try:
+            delthis = post.comments_set.filter(user=request.user).get(pk=request.POST['delthiscomment'])
+            print('获得删除评论对象：', delthis)
+        except:
+            return HttpResponse('你没有此权限')
+    delthis.isdelete = True
+    delthis.save()
+    print('删除后评论对象为：', delthis)
+    return HttpResponseRedirect(reverse('post_detail', args=(pk,)))

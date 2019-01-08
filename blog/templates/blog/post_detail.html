@@ -6,6 +6,10 @@
                 <div class="date">
                     {{ post.published_date }}
                 </div>
+                <br />
+                <div class="date">
+                    {{ post.author }}
+                </div>
             {% endif %}
             {% if post.author == user %}
             <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -18,7 +22,7 @@
 
     <form action="{% url 'click_like' pk=post.pk %}" method="post">
     {% csrf_token %}
-        {% if likeituserstate == 1 %}
+        {% if likeituserstate is False %}
         <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-default">取消点赞</button>
         {% else %}
         <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-primary">点赞</button>
@@ -39,25 +43,24 @@
         <button type="submit" class="btn btn-primary">评论</button>
     </form>
 
-    <!--{% for comment in comments %}
-    {{ comment.commentarticle }}
-    {{ comment.commentuser }}
-    {{ comment.commenttime }}
-    {{ comment.commentcontent }}
-    {{ comment.commentexist }}
-    <br />
-    {% endfor %}-->
-
+    评论（{{comments.count}}）
     <form action="{% url 'del_comment' pk=post.pk %}" method="post">
         {% csrf_token %}
         {% for comment in comments %}
-        {{ comment.commentarticle }}
-        {{ comment.commentuser }}
-        {{ comment.commenttime }}
-        {{ comment.commentcontent }}
-        {{ comment.commentexist }}
+        {{ comment.user }}
+        <div class="date">
+            {{ comment.time }}
+        </div>
+        <br />{{ comment.content }}
+        <br />
+        <!--{{ comment.isdelete }}
+        评论人：{{comment.user}}
+        登录者：{{request.user}}
+        作者：{{post.author}}-->
+        {% if comment.user == request.user or post.author == request.user %}
         <input type="radio" name="delthiscomment" id="comment{{ forloop.counter }}" value="{{ comment.id }}">
-        <label for="comment{{ forloop.counter }}">删除评论</label><br>
+        <label for="comment{{ forloop.counter }}">删除评论</label>
+        {% endif %}<br>
         {% endfor %}
         <input type="submit" value="删除">
     </form>
