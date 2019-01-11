@@ -154,11 +154,12 @@ def comment_on(request, pk):
         getonecomment = request.POST.get('onecomment')
         print('获取评论内容为：', getonecomment)
         if getonecomment:
-            Comments.objects.create(
+            Newcomment = Comments.objects.create(
                 user = request.user,
                 article = post,
                 content = getonecomment,
             )
+            print('Newcomment:', Newcomment)
             return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
         return HttpResponse('还没有评论')
     return HttpResponse('请先登录')

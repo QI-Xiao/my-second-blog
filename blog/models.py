@@ -25,6 +25,7 @@ class Comments(models.Model):
     content = models.TextField()
     time = models.DateTimeField(default=timezone.now)
     isdelete = models.BooleanField(default=False)
+    # reply = models.ForeignKey('self', null=True, blank=True, related_name='replies')
 
     def __str__(self):
         return (

@@ -1,68 +1,107 @@
-    {% extends 'blog/base.html' %}
+{% extends 'blog/base.html' %}
 
-    {% block content %}
-        <div  class="post">
-            {% if post.published_date %}
-                <div class="date">
-                    {{ post.published_date }}
-                </div>
-                <br />
-                <div class="date">
-                    {{ post.author }}
-                </div>
-            {% endif %}
-            {% if post.author == user %}
-            <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-            {% endif %}
-            <h1>{{ post.title }}</h1>
-            <p>{{ post.text|linebreaksbr }}</p>
-        </div>
+{% block head %}
+    <script>
+        function checkcomment(){
+            if($('#onecomment').val().length < 10 && $('#onecomment').val().length != 0){
+                alert('评论不能少于10字')
+            }
+        }
 
-        <br />
+        function clickcommentbtn(){
+            if ($("#buttoncomment").attr("type")=="button" && $("#onecomment").css("display")=="none"){
+                $("#onecomment").css("display", "inline-block");
+            }else if($("#buttoncomment").attr("type")=="button" && $("#onecomment").css("display")=="inline-block"){
+                $("#buttoncomment").prop("type", "submit");
+            }
+        }
 
-    <form action="{% url 'click_like' pk=post.pk %}" method="post">
-    {% csrf_token %}
-        {% if likeituserstate is False %}
-        <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-default">取消点赞</button>
-        {% else %}
-        <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-primary">点赞</button>
+        function postcomment(){
+            $.post("{% url 'comment_on' pk=post.pk %}", {
+            "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            "onecomment":$("#onecomment2").val()
+            }, function(data, status){  // alert("data: "+ data + "\nstatus:" + status);
+            if (status == "success"){
+            window.location.reload()
+            }
+            });
+            };
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div  class="post">
+        {% if post.published_date %}
+            <div class="date">
+                {{ post.published_date }}
+            </div>
+            <br />
+            <div class="date">
+                {{ post.author }}
+            </div>
         {% endif %}
-    </form>
+        {% if post.author == user %}
+        <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        {% endif %}
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.text|linebreaksbr }}</p>
+    </div>
 
     <br />
-    点赞数：{{likeit.count}}<br />
-    {% for onelike in likeit %}
-    {{onelike}}
-    {% endfor %}
 
-    <br />
+<form action="{% url 'click_like' pk=post.pk %}" method="post">
+{% csrf_token %}
+    {% if likeituserstate is False %}
+    <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-default">
+        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> 已赞同 {{likeit.count}}
+    </button>
+    {% else %}
+    <button type="submit" name="clicklikeit"  value="clicklikeit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> 赞同 {{likeit.count}}
+    </button>
+    {% endif %}
+</form>
 
-    <form action="{% url 'comment_on' pk=post.pk %}" method="post">
+<br />
+点赞数：{{likeit.count}}<br />
+{% for onelike in likeit %}
+{{onelike}}
+{% endfor %}
+
+<br />
+
+<form action="{% url 'comment_on' pk=post.pk %}" method="post" > <!--onsubmit="checkForm()"-->
+{% csrf_token %}
+    <input class="form-control" style="display:none;" type="text" id="onecomment" name="onecomment" placeholder="输入评论" required onblur="checkcomment()">
+    <button type="button" id="buttoncomment" class="btn btn-primary" onclick="clickcommentbtn()">评论</button>
+</form>
+
+评论（{{comments.count}}）
+<form name="commentform" action="{% url 'del_comment' pk=post.pk %}" method="post">
     {% csrf_token %}
-        <input class="form-control" type="text" name="onecomment" placeholder="输入评论">
-        <button type="submit" class="btn btn-primary">评论</button>
-    </form>
+    {% for comment in comments %}
+    {{ comment.user }}
+    <div class="date">
+        {{ comment.time }}
+    </div>
+    <br />{{ comment.content }}
+    <br />
+    <!--{{ comment.isdelete }}
+    评论人：{{comment.user}}
+    登录者：{{request.user}}
+    作者：{{post.author}}-->
+    {% if comment.user == request.user or post.author == request.user %}
+    <input type="hidden" name="delthiscomment" value="{{ comment.id }}">
+    <a href="javascript:document.commentform.submit();">删除评论</a>
+    <!--<a href="javascript:void(0);" onclick="js_method()">删除评论</a>-->
+    {% endif %}<br>
+    {% endfor %}
+</form>
 
-    评论（{{comments.count}}）
-    <form action="{% url 'del_comment' pk=post.pk %}" method="post">
-        {% csrf_token %}
-        {% for comment in comments %}
-        {{ comment.user }}
-        <div class="date">
-            {{ comment.time }}
-        </div>
-        <br />{{ comment.content }}
-        <br />
-        <!--{{ comment.isdelete }}
-        评论人：{{comment.user}}
-        登录者：{{request.user}}
-        作者：{{post.author}}-->
-        {% if comment.user == request.user or post.author == request.user %}
-        <input type="radio" name="delthiscomment" id="comment{{ forloop.counter }}" value="{{ comment.id }}">
-        <label for="comment{{ forloop.counter }}">删除评论</label>
-        {% endif %}<br>
-        {% endfor %}
-        <input type="submit" value="删除">
-    </form>
 
-    {% endblock %}
+<form>
+    <input class="form-control" type="text" id="onecomment2" name="onecomment" placeholder="输入评论" required>
+    <button type="button" id="buttoncomment2" class="btn btn-primary" onclick="postcomment()">评论</button>
+</form>
+
+{% endblock %}
