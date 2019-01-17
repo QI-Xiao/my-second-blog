@@ -45,3 +45,4 @@ class Likeit(models.Model):
                 '点赞人：%s，点赞文章：%s，点赞时间：%s，点赞是否取消：%s'
                 % (self.user, self.article, str(self.time), self.isdelete)
         )
+

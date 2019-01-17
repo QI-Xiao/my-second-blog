@@ -198,14 +198,14 @@ def del_comment(request, pk):
     if post.author == request.user:
         delthis = post.comments_set.get(pk=request.POST['delthiscomment'])
         print('文章作者进行的操作')
-        print('获得删除评论对象：', delthis)
+        print('获得删除评论对象：', delthis, delthis.id)
     else:
         try:
             delthis = post.comments_set.filter(user=request.user).get(pk=request.POST['delthiscomment'])
-            print('获得删除评论对象：', delthis)
+            print('获得删除评论对象：', delthis, delthis.id)
         except:
             return HttpResponse('你没有此权限')
     delthis.isdelete = True
     delthis.save()
-    print('删除后评论对象为：', delthis)
+    print('删除后评论对象为：', delthis, delthis.id)
     return HttpResponseRedirect(reverse('post_detail', args=(pk,)))

@@ -3,41 +3,29 @@
 {% block head %}
     <script>
         function checkcomment(){
-            if($('#onecomment').val().length < 10){
-                alert('评论不能少于10字');
+            if($('#onecomment').val().length < 10 && $('#onecomment').val().length != 0){
+                alert('评论不能少于10字')
             }
         }
 
         function clickcommentbtn(){
-            if ($("#onecomment").css("display")=="none"){
+            if ($("#buttoncomment").attr("type")=="button" && $("#onecomment").css("display")=="none"){
                 $("#onecomment").css("display", "inline-block");
-            }else if ($("#onecomment").css("display")=="inline-block"){
-                if ($('#onecomment').val().length < 10){
-                    alert('评论不能少于10字');
-                }else if($('#onecomment').val().length >= 10 && $("#onecomment").css("display")=="inline-block"){
-                    $.post("{% url 'comment_on' pk=post.pk %}", {
-                        "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                        "onecomment":$("#onecomment").val()
-                        }, function(data, status){
-                        if (status == "success"){
-                        window.location.reload()
-                        }
-                    });
-                    $("#onecomment").css("display")=="none";
-                }
+            }else if($("#buttoncomment").attr("type")=="button" && $("#onecomment").css("display")=="inline-block"){
+                $("#buttoncomment").prop("type", "submit");
             }
         }
 
-        function delcomment(elem){
-            $.post("{% url 'del_comment' pk=post.pk %}", {
-                "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                "delthiscomment": $(elem).parent().find("input").val()
-                }, function(data, status){
-                if (status == "success"){
-                window.location.reload()
-                }
+        function postcomment(){
+            $.post("{% url 'comment_on' pk=post.pk %}", {
+            "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            "onecomment":$("#onecomment2").val()
+            }, function(data, status){  // alert("data: "+ data + "\nstatus:" + status);
+            if (status == "success"){
+            window.location.reload()
+            }
             });
-        }
+            };
     </script>
 {% endblock %}
 
@@ -82,30 +70,38 @@
 
 <br />
 
-<form>
-    <input class="form-control" style="display:none;" type="text" id="onecomment" name="onecomment" placeholder="输入评论" onblur="checkcomment()">
+<form action="{% url 'comment_on' pk=post.pk %}" method="post" > <!--onsubmit="checkForm()"-->
+{% csrf_token %}
+    <input class="form-control" style="display:none;" type="text" id="onecomment" name="onecomment" placeholder="输入评论" required onblur="checkcomment()">
     <button type="button" id="buttoncomment" class="btn btn-primary" onclick="clickcommentbtn()">评论</button>
 </form>
 
-评论（{{comments.count}})
-
-<!--<form name="commentform">-->
+评论（{{comments.count}}）
+<form name="commentform" action="{% url 'del_comment' pk=post.pk %}" method="post">
+    {% csrf_token %}
     {% for comment in comments %}
     {{ comment.user }}
-    {{ comment.id }}
     <div class="date">
         {{ comment.time }}
     </div>
     <br />{{ comment.content }}
     <br />
+    <!--{{ comment.isdelete }}
+    评论人：{{comment.user}}
+    登录者：{{request.user}}
+    作者：{{post.author}}-->
     {% if comment.user == request.user or post.author == request.user %}
-    <div id="comment{{ forloop.counter }}">
     <input type="hidden" name="delthiscomment" value="{{ comment.id }}">
-    <a href="javascript:void(0);" onclick="delcomment(this)">删除评论</a>
-    </div>
+    <a href="javascript:document.commentform.submit();">删除评论</a>
+    <!--<a href="javascript:void(0);" onclick="js_method()">删除评论</a>-->
     {% endif %}<br>
-    {% empty %} 暂无评论
     {% endfor %}
-<!--</form>-->
+</form>
+
+
+<form>
+    <input class="form-control" type="text" id="onecomment2" name="onecomment" placeholder="输入评论" required>
+    <button type="button" id="buttoncomment2" class="btn btn-primary" onclick="postcomment()">评论</button>
+</form>
 
 {% endblock %}
