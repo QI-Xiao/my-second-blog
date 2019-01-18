@@ -1,0 +1,24 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div>
+    <img src="/static/movieposter/{{themovie.poster}}"/>
+</div>
+
+<div>
+    <h2>电影名：{{ themovie.title }}</h2>
+    <p>排名：{{ themovie.rank }}</p>
+    <p>评分：{{ themovie.averagegrade }}</p>
+    <p>导演：{{ themovie.director }}</p>
+    <p>主演：{{ themovie.casts }}</p>
+</div>
+
+<div>
+    {% for comment in moviecomments %}
+    <h4>评论人：{{ comment.user }}</h4>
+    <p>内容：{{ comment.content }}</p>
+    <p>时间：{{ comment.time }}</p>
+    <p>评价：{{ comment.onesgrade }}</p>
+    {% endfor %}
+</div>
+{% endblock %}

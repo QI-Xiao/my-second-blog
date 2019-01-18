@@ -83,6 +83,7 @@
                             <a href="{% url 'do_login' %}">登录</a>
                             <a href="{% url 'register' %}">注册</a>
                             {% endif %}
+                            <a href="{% url 'movie_list' %}">豆瓣电影TOP50</a>
                         </div>
                         {% block content %}
                         {% endblock %}

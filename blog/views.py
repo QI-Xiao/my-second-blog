@@ -4,11 +4,11 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
-from .models import Post, Comments, Likeit
+from .models import Post, Comments, Likeit, Movies, Commentmovie
 from .forms import PostForm, UserForm
 from django.contrib.auth.models import User
 from django.contrib import auth
-# Create your views here.
+from django.core.paginator import Paginator
 
 
 def register(request):
@@ -209,3 +209,23 @@ def del_comment(request, pk):
     delthis.save()
     print('删除后评论对象为：', delthis, delthis.id)
     return HttpResponseRedirect(reverse('post_detail', args=(pk,)))
+
+
+def movie_list(request):
+    movies = Movies.objects.all()
+    limit = 10
+    paginator = Paginator(movies, limit)
+    page = request.GET.get('page','1')
+    result = paginator.page(page)
+    return render(request, 'blog/movie_list.html', {'movies':result})
+
+
+def movie_detail(request, pk):
+    themovie = get_object_or_404(Movies, pk=pk)
+    moviecomments = themovie.commentmovie_set.all()
+    print(themovie,' pk:',pk)
+
+    return render(request, 'blog/movie_detail.html', {
+        'themovie': themovie,
+        'moviecomments':moviecomments,
+    })

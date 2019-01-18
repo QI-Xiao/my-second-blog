@@ -14,6 +14,9 @@ urlpatterns = [
     re_path(r'^post/(?P<pk>[0-9]+)/comment/$', views.comment_on, name='comment_on'),
     re_path(r'^post/(?P<pk>[0-9]+)/like/$', views.click_like, name='click_like'),
     re_path(r'^post/(?P<pk>[0-9]+)/delcomment/$', views.del_comment, name='del_comment'),
+    path(r'movie/', views.movie_list, name='movie_list'),
+    re_path(r'movie/(?P<pk>[0-9]+)/$', views.movie_detail, name='movie_detail'),
+
 ]
 
 

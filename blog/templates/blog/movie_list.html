@@ -1,0 +1,44 @@
+{% extends 'blog/base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<ul class="list-unstyled">
+{% for movie in movies %}
+    <li>
+        <div class="inline-block">
+            <a href="{% url 'movie_detail' pk=movie.pk %}"><img width="150" alt="{{ movie.title }}" src="/static/movieposter/{{movie.poster}}" class="img-rounded" /></a>
+            <div class="">
+                <p class="h2">电影名：{{ movie.title }}</p>
+                <p>导演：{{ movie.director }}</p>
+                <p>演员：{{ movie.casts }}</p>
+                <p>评分：{{ movie.averagegrade }}</p>
+                <p>排名：{{ movie.rank }}</p>
+            </div>
+        </div>
+
+    </li>
+{% endfor %}
+</ul>
+
+<div>
+    <ul class="pagination">
+    <li><a href="/movie/?page=1">首页</a></li>
+        {% if movies.has_previous %}
+        <li><a href="/movie/?page={{ movies.previous_page_number }}">上一页</a></li>
+        {% endif %}
+
+        {% for num in movies.paginator.page_range %}
+        <li><a href="/movie/?page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+
+        {% if movies.has_next %}
+        <li><a href="/movie/?page={{ movies.next_page_number }}">下一页</a></li>
+        {% endif %}
+        <li><a href="/movie/?page={{ movies.paginator.num_pages }}">尾页</a></li>
+     </ul>
+</div>
+
+{% endblock %}

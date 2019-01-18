@@ -46,3 +46,27 @@ class Likeit(models.Model):
                 % (self.user, self.article, str(self.time), self.isdelete)
         )
 
+
+class Movies(models.Model):
+    title = models.CharField(max_length=100)
+    rank = models.IntegerField()
+    poster = models.TextField()
+    averagegrade = models.FloatField()
+    director = models.CharField(max_length=100)
+    casts = models.TextField()
+    douban_id = models.IntegerField()
+
+    def __str__(self):
+        return (
+            '电影名：%s，排名：%d，评分：%.1f，导演：%s,电影id：%d'
+            % (self.title, self.rank, self.averagegrade, self.director, self.douban_id)
+    )
+
+
+class Commentmovie(models.Model):
+    user = models.CharField(max_length=100)
+    whichmovie = models.ForeignKey('Movies', on_delete=models.CASCADE)
+    content = models.TextField()
+    time = models.DateTimeField()
+    onesgrade = models.IntegerField(default=0)
+    isdelete = models.BooleanField(default=False)
